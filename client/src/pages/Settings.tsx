@@ -71,10 +71,6 @@ export function Settings() {
           />
         </div>
       </section>
-
-      <p className="mt-10 text-xs leading-relaxed text-muted">
-        Preferences stay in this browser. The API key remains on the server.
-      </p>
     </div>
   );
 }

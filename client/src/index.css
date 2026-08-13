@@ -260,6 +260,7 @@ body {
   padding: 0.58rem 1.05rem;
   font-size: 0.875rem;
   font-weight: 600;
+  cursor: pointer;
   transition: filter 180ms ease, opacity 180ms ease;
 }
 
@@ -280,6 +281,7 @@ body {
   padding: 0.55rem 0.9rem;
   font-size: 0.875rem;
   font-weight: 500;
+  cursor: pointer;
   transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
 }
 
@@ -303,6 +305,7 @@ body {
   font-size: 0.75rem;
   font-weight: 520;
   line-height: 1.2;
+  cursor: pointer;
   transition:
     color 160ms ease,
     border-color 160ms ease,
@@ -321,6 +324,7 @@ body {
   color: var(--color-muted);
   padding: 0;
   font-size: 0.875rem;
+  cursor: pointer;
   transition: color 180ms ease;
 }
 
@@ -358,6 +362,7 @@ body {
   padding: 0.15rem 0;
   color: var(--color-muted);
   font-size: 0.9rem;
+  cursor: pointer;
   transition: color 180ms ease;
 }
 
@@ -392,6 +397,7 @@ body {
   color: var(--color-muted);
   font-size: 0.9rem;
   text-decoration: none;
+  cursor: pointer;
   transition: color 180ms ease, background-color 180ms ease;
 }
 
@@ -419,6 +425,7 @@ body {
   background: transparent;
   text-align: left;
   color: var(--color-ink);
+  cursor: pointer;
   transition: color 180ms ease;
 }
 
@@ -436,6 +443,7 @@ body {
   border-bottom: 1px solid var(--color-border);
   background: transparent;
   text-align: left;
+  cursor: pointer;
 }
 
 .option-row-active .option-title {
