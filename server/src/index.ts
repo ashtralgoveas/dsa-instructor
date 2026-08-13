@@ -26,15 +26,27 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/dsa", dsaRouter);
 
 if (serveClient) {
-  app.use(express.static(clientDistPath));
+  // Always land on Dashboard for the site root (do not rely on client JS).
+  app.get("/", (_req, res) => {
+    res.redirect(302, "/dashboard");
+  });
+
+  // Serve built assets; index.html is handled by the SPA fallback below.
+  app.use(express.static(clientDistPath, { index: false }));
 
   // SPA fallback for React Router routes (/dashboard, /topics, ...)
-  app.get("/{*path}", (req, res) => {
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      next();
+      return;
+    }
     if (req.path.startsWith("/api")) {
       res.status(404).json({ error: "Not found" });
       return;
     }
-    res.sendFile(clientIndexPath);
+    res.sendFile(clientIndexPath, (err) => {
+      if (err) next(err);
+    });
   });
 }
 
