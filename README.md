@@ -4,6 +4,20 @@ A simple AI-powered Data Structures & Algorithms instructor. Ask a DSA question 
 
 Built with **React**, **Express**, and **Google Gemini**.
 
+## Screenshots
+
+### Dashboard
+
+![DSA Instructor Dashboard](docs/screenshots/dashboard.png)
+
+### AI Conversation
+
+![DSA Instructor Conversation](docs/screenshots/conversation.png)
+
+### Topics
+
+![DSA Instructor Topics](docs/screenshots/topics.png)
+
 ## Prerequisites
 
 - **Node.js** `>= 20`
