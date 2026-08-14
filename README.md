@@ -4,6 +4,8 @@ A simple AI-powered Data Structures & Algorithms instructor. Ask a DSA question 
 
 Built with **React**, **Express**, and **Google Gemini**.
 
+**Live demo:** [https://dsa-instructor-9ym5.onrender.com](https://dsa-instructor-9ym5.onrender.com)
+
 ## Screenshots
 
 ### Dashboard
