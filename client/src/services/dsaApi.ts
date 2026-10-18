@@ -62,10 +62,6 @@ export async function askInstructor(
     }
 
     if (!response.ok) {
-      if (response.status === 429) {
-        throw new Error(QUOTA_USER_MESSAGE);
-      }
-
       if (response.status === 499) {
         throw new RequestCancelledError();
       }

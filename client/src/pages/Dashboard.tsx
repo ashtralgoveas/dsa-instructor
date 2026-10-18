@@ -10,7 +10,6 @@ import {
   askInstructor,
   GENERIC_USER_MESSAGE,
   INVALID_CONVERSATION_USER_MESSAGE,
-  QUOTA_USER_MESSAGE,
   RequestCancelledError,
 } from "../services/dsaApi";
 import type { ConversationTurn, DashboardPrefillState, PopularTopic } from "../types/dsa";
@@ -232,17 +231,7 @@ export function Dashboard() {
 
       {error ? (
         <div className="mt-7 space-y-3 border-t border-border pt-5">
-          <p className="status-error m-0 text-sm leading-relaxed">
-            {error === QUOTA_USER_MESSAGE ||
-            error === INVALID_CONVERSATION_USER_MESSAGE
-              ? error
-              : GENERIC_USER_MESSAGE}
-          </p>
-          {error !== QUOTA_USER_MESSAGE &&
-          error !== INVALID_CONVERSATION_USER_MESSAGE &&
-          error !== GENERIC_USER_MESSAGE ? (
-            <p className="m-0 text-xs text-muted">{error}</p>
-          ) : null}
+          <p className="status-error m-0 text-sm leading-relaxed">{error}</p>
           <div className="flex flex-wrap gap-4">
             <button
               type="button"

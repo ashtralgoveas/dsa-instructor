@@ -1,7 +1,11 @@
 import { Router } from "express";
-import { askDsaInstructor } from "../services/gemini.js";
+import { askDsaInstructor, GEMINI_MODEL } from "../services/gemini.js";
 import { DIFFICULTIES, TOPICS, type DsaAskRequest } from "../types/dsa.js";
-import { isAbortError, toClientError } from "../utils/errors.js";
+import {
+  isAbortError,
+  sanitizeUpstreamError,
+  toClientError,
+} from "../utils/errors.js";
 
 const router = Router();
 
@@ -118,11 +122,14 @@ router.post("/ask", async (req, res) => {
       return;
     }
 
-    const { statusCode, userMessage, technicalMessage } = toClientError(error);
+    const { statusCode, userMessage, technicalMessage, kind } =
+      toClientError(error);
     console.error("POST /api/dsa/ask failed:", {
       statusCode,
+      kind,
       technicalMessage,
-      error,
+      gemini: sanitizeUpstreamError(error, { model: GEMINI_MODEL }),
+      hasApiKey: Boolean(process.env.GEMINI_API_KEY),
     });
 
     if (!res.headersSent && !res.writableEnded) {

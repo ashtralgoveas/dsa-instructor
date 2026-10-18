@@ -8,8 +8,9 @@ import type {
   DsaAskRequest,
   DsaAskResponse,
 } from "../types/dsa.js";
+import { AppError } from "../utils/errors.js";
 
-const MODEL = "gemini-3.6-flash";
+export const GEMINI_MODEL = "gemini-3.6-flash";
 
 const RESPONSE_SCHEMA = {
   type: "object",
@@ -39,7 +40,11 @@ const RESPONSE_SCHEMA = {
 function getClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not set");
+    throw new AppError(
+      500,
+      "The server is missing GEMINI_API_KEY. Set it in the hosting environment and restart the service.",
+      "GEMINI_API_KEY is not set"
+    );
   }
   return new GoogleGenAI({ apiKey });
 }
@@ -85,7 +90,7 @@ export async function askDsaInstructor(
   // SDK note: AbortSignal is client-only and does not cancel billed server-side work.
   const interaction = await ai.interactions.create(
     {
-      model: MODEL,
+      model: GEMINI_MODEL,
       system_instruction: DSA_SYSTEM_INSTRUCTION,
       input,
       previous_interaction_id: request.previousInteractionId,

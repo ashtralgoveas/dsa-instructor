@@ -4,6 +4,7 @@ import express from "express";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { GEMINI_MODEL } from "./services/gemini.js";
 import dsaRouter from "./routes/dsa.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,6 +53,11 @@ if (serveClient) {
 
 app.listen(port, () => {
   console.log(`DSA Instructor API listening on http://localhost:${port}`);
+  console.log(
+    `Gemini model: ${GEMINI_MODEL}; GEMINI_API_KEY ${
+      process.env.GEMINI_API_KEY ? "is set" : "is NOT set"
+    }`
+  );
   if (serveClient) {
     console.log(`Serving frontend from ${clientDistPath}`);
   } else {
