@@ -1,6 +1,8 @@
 # DSA Instructor
 
-A simple AI-powered Data Structures & Algorithms instructor. Ask a DSA question and get a clear explanation from Gemini.
+An AI-powered Data Structures & Algorithms instructor. Ask a DSA question in plain language and get a clear, teaching-style answer from Gemini — explanation, examples, approach, and code when it helps.
+
+Use the **Dashboard** to ask freely or continue a conversation with follow-ups. Browse **Topics** to start a suggested question, reopen past questions from **History**, and adjust dark/light mode plus simple/detailed answers in **Settings**.
 
 Built with **React**, **Express**, and **Google Gemini**.
 
