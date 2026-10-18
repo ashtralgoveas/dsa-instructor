@@ -125,11 +125,11 @@ router.post("/ask", async (req, res) => {
     const { statusCode, userMessage, technicalMessage, kind } =
       toClientError(error);
     console.error("POST /api/dsa/ask failed:", {
-      statusCode,
+      ourStatusCode: statusCode,
       kind,
-      technicalMessage,
-      gemini: sanitizeUpstreamError(error, { model: GEMINI_MODEL }),
       hasApiKey: Boolean(process.env.GEMINI_API_KEY),
+      envVarExpected: "GEMINI_API_KEY",
+      gemini: sanitizeUpstreamError(error, { model: GEMINI_MODEL }),
     });
 
     if (!res.headersSent && !res.writableEnded) {

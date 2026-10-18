@@ -120,6 +120,105 @@ function extractQuotaMetric(text: string): string | undefined {
   return metricMatch?.[1] || metricMatch?.[2];
 }
 
+const SENSITIVE_KEY = /api[_-]?key|authorization|token|secret|password|credential/i;
+
+function parseJsonIfPossible(value: string): unknown {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return undefined;
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return undefined;
+  }
+}
+
+function sanitizeValue(value: unknown, depth = 0): unknown {
+  if (value == null) return value;
+  if (depth > 6) return "[truncated]";
+  if (typeof value === "number" || typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const parsed = parseJsonIfPossible(value);
+    if (parsed !== undefined) return sanitizeValue(parsed, depth + 1);
+    return redactSecrets(value).slice(0, 1500);
+  }
+  if (Array.isArray(value)) {
+    return value.slice(0, 20).map((item) => sanitizeValue(item, depth + 1));
+  }
+  if (typeof value !== "object") return redactSecrets(String(value)).slice(0, 200);
+
+  const output: Record<string, unknown> = {};
+  if (value instanceof Error) {
+    output.name = value.name;
+    output.message = sanitizeValue(value.message, depth + 1);
+  }
+
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+    if (SENSITIVE_KEY.test(key)) {
+      output[key] = "[redacted]";
+      continue;
+    }
+    output[key] = sanitizeValue(nested, depth + 1);
+  }
+
+  return output;
+}
+
+function collectQuotaViolations(sanitized: unknown): unknown[] {
+  const found: unknown[] = [];
+
+  function walk(node: unknown, depth = 0) {
+    if (!node || depth > 8) return;
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item, depth + 1);
+      return;
+    }
+    if (typeof node !== "object") return;
+    const record = node as Record<string, unknown>;
+    if (
+      record.quotaMetric ||
+      record.quotaId ||
+      record.quota_metric ||
+      Array.isArray(record.violations)
+    ) {
+      found.push(record);
+    }
+    for (const nested of Object.values(record)) walk(nested, depth + 1);
+  }
+
+  walk(sanitized);
+  return found.slice(0, 10);
+}
+
+function collectRetryDelay(sanitized: unknown): string | undefined {
+  let found: string | undefined;
+
+  function walk(node: unknown, depth = 0) {
+    if (found || !node || depth > 8) return;
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item, depth + 1);
+      return;
+    }
+    if (typeof node === "string") {
+      found = extractRetryHint(node) ?? found;
+      return;
+    }
+    if (typeof node !== "object") return;
+    const record = node as Record<string, unknown>;
+    if (typeof record.retryDelay === "string") {
+      found = record.retryDelay;
+      return;
+    }
+    if (typeof record.retry_delay === "string") {
+      found = record.retry_delay;
+      return;
+    }
+    for (const nested of Object.values(record)) walk(nested, depth + 1);
+  }
+
+  walk(sanitized);
+  return found;
+}
+
 export function isQuotaExceededError(error: unknown): boolean {
   return classifyGeminiFailure(error).kind === "quota";
 }
@@ -248,15 +347,23 @@ export function sanitizeUpstreamError(
   error: unknown,
   extras?: { model?: string }
 ): Record<string, unknown> {
-  const technicalMessage = redactSecrets(getErrorText(error)).slice(0, 800);
+  const technicalMessage = redactSecrets(getErrorText(error)).slice(0, 1500);
+  const body = sanitizeValue(error);
+  const quotaViolations = collectQuotaViolations(body);
+  const retryDelay =
+    collectRetryDelay(body) ?? extractRetryHint(technicalMessage) ?? null;
+
   return {
-    model: extras?.model,
+    model: extras?.model ?? null,
+    envVar: "GEMINI_API_KEY",
     kind: classifyGeminiFailure(error).kind,
+    errorStatus: getErrorCodeLabel(error) ?? getErrorStatus(error) ?? null,
     httpStatus: getErrorStatus(error) ?? null,
-    code: getErrorCodeLabel(error) ?? null,
-    retryHint: extractRetryHint(technicalMessage) ?? null,
+    errorMessage: technicalMessage,
+    retryDelay,
     quotaMetric: extractQuotaMetric(technicalMessage) ?? null,
-    message: technicalMessage,
+    quotaViolations,
+    geminiError: body,
   };
 }
 
