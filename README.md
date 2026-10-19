@@ -121,7 +121,7 @@ Then open http://localhost:3000 (or your configured `PORT`).
 React frontend → Express backend → Google Gemini API
 ```
 
-The Gemini API key stays on the backend. The model used is **`gemini-3.6-flash`**.
+The Gemini API key stays on the backend. The model used is **`gemini-3.5-flash-lite`**.
 
 ## Troubleshooting
 

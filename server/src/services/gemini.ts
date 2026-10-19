@@ -10,7 +10,7 @@ import type {
 } from "../types/dsa.js";
 import { AppError } from "../utils/errors.js";
 
-export const GEMINI_MODEL = "gemini-3.6-flash";
+export const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 const RESPONSE_SCHEMA = {
   type: "object",
